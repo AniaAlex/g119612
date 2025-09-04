@@ -1,8 +1,11 @@
 package etsi119612
 
 import (
+	"context"
+	"crypto/x509"
 	"fmt"
-	"net/http"
+
+	go_cache "github.com/eko/gocache/lib/v4/cache"
 )
 
 // pointer here insteda of value?
@@ -23,33 +26,60 @@ func (g *GraphUrls) AddEdge(parentURL string, edge Edge) {
 	g.adj[parentURL] = append(g.adj[parentURL], edge)
 }
 
-func GraphSearch(rootURL string) (*GraphUrls, error) {
+// better to have multiple options of cache
+func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte]) (*GraphUrls, error) {
 	graph := NewGraph()
 	visited := map[string]bool{}
+
 	queue := []Edge{{URL: rootURL, Depth: 0}}
 
 	//should be in loop
 	//to check the graph algorythm only, otherwise multiple middle steps
-	_, err := http.Get(rootURL)
-	if err != nil {
-		panic(err)
-	}
 
 	for len(queue) > 0 {
-
 		current := queue[0]
 		queue = queue[1:]
 
 		if visited[current.URL] {
 			continue
 		}
-		visited[current.URL] = true
-		fmt.Println(current.URL)
+		ctx := context.Background()
+		bodyBytes, err := cache.Get(ctx, current.URL)
 
-		//cache bytes and other stages here?
+		//try to fetch
+		if err != nil {
+			fmt.Errorf("%v", err)
+			bodyBytes, signer, err := FetchTSLBytes(current.URL)
+			if err == nil {
+				//here add to cache
+				err = cache.Set(ctx, "https://ewc-consortium.github.io", bodyBytes)
+				visited[current.URL] = true
+				if err != nil {
+					panic(err)
+				}
+				tsl, err := UnmarshalCleanCerts(bodyBytes, signer, current.URL)
 
-		//here come links fetched from the xml, mock for now
-		links := []string{"https://SE-TL.se", "https://NL-TL.se"}
+				if err == nil {
+					fmt.Println("Here should be verification:%v", tsl)
+					break
+				}
+
+			}
+
+		}
+
+		var signer x509.Certificate
+		// need to add signer somehow other way it later
+		tsl, err := UnmarshalCleanCerts(bodyBytes, signer, current.URL)
+		if err == nil {
+			fmt.Println("Here should be verification:%v", tsl)
+			//if verification is successful then break
+			break
+		}
+
+		//if verification failed but we have tsl, we add children to continue with the loop
+		// here should list the pointers in the tsl
+		links := []string{"https://trustedlist.pts.se/SE-TL.xml", "https://trustedlist.pts.se/NL-TL.xml"}
 
 		for _, link := range links {
 
@@ -66,5 +96,6 @@ func GraphSearch(rootURL string) (*GraphUrls, error) {
 		}
 
 	}
+
 	return graph, nil
 }
