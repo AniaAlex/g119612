@@ -8,11 +8,6 @@ import (
 )
 
 func TestGraph(t *testing.T) {
-	defer gock.Off()
-	gock.New("https://ewc-consortium.github.io").
-		Get("/EWC-TL").
-		Reply(200).
-		File("./testdata/EWC-TL.xml")
 
 	defer gock.Off()
 	gock.New("https://trustedlist.pts.se").
@@ -22,9 +17,21 @@ func TestGraph(t *testing.T) {
 
 	defer gock.Off()
 	gock.New("https://trustedlist.pts.se").
-		Get("/NL-TL.xml").
+		Get("/SE-TL.xml").
 		Reply(200).
 		File("./testdata/SE-TL.xml")
+
+	defer gock.Off()
+	gock.New("https://ec.europa.eu/tools/lotl").
+		Get("/eu-lotl.xml").
+		Reply(200).
+		File("./testdata/EWC-TL.xml")
+
+	defer gock.Off()
+	gock.New("https://ec.europa.eu/tools/lotl").
+		Get("/eu-lotl.xml").
+		Reply(200).
+		File("./testdata/EWC-TL.xml")
 
 	cachesets := cache.CacheSettings{Backend: cache.BackendGoCache}
 	deps := cache.Dependencies{}
@@ -32,10 +39,10 @@ func TestGraph(t *testing.T) {
 	//probably mock here better
 	newCache := cache.NewCache[[]byte](cachesets, deps)
 
-	graph, error := GraphSearch("https://ewc-consortium.github.io/ewc-trust-list/EWC-TL", newCache)
+	graph, error := GraphSearch("https://trustedlist.pts.se/SE-TL.xml", newCache)
 
 	if error != nil {
 		t.Fatal(error)
 	}
-	t.Logf("%v", graph.adj["https://ewc-consortium.github.io/ewc-trust-list/EWC-TL"])
+	t.Logf("%v", graph.adj)
 }

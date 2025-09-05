@@ -2,7 +2,6 @@ package etsi119612
 
 import (
 	"context"
-	"crypto/x509"
 	"fmt"
 
 	go_cache "github.com/eko/gocache/lib/v4/cache"
@@ -45,50 +44,51 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte]) (*GraphUrls, err
 		}
 		ctx := context.Background()
 		bodyBytes, err := cache.Get(ctx, current.URL)
+		fmt.Printf("there %v", bodyBytes)
 
 		//try to fetch
 		if err != nil {
 			fmt.Errorf("%v", err)
-			bodyBytes, signer, err := FetchTSLBytes(current.URL)
+			bodyBytes, err := FetchTSLBytes(current.URL)
 			if err == nil {
 				//here add to cache
-				err = cache.Set(ctx, "https://ewc-consortium.github.io", bodyBytes)
+				err = cache.Set(ctx, current.URL, bodyBytes)
 				visited[current.URL] = true
 				if err != nil {
 					panic(err)
 				}
-				tsl, err := UnmarshalCleanCerts(bodyBytes, signer, current.URL)
-
+				tsl, err := UnmarshalCleanCerts(bodyBytes, current.URL)
+				_ = tsl
 				if err == nil {
-					fmt.Println("Here should be verification:%v", tsl)
-					break
+					fmt.Printf("Here should be verification")
+					// here should be break
 				}
-
 			}
-
 		}
-
-		var signer x509.Certificate
+		//this function is not needed temp--will be from cache
+		bodyBytes, err = FetchTSLBytes(current.URL)
+		if err != nil {
+			panic(err)
+		}
 		// need to add signer somehow other way it later
-		tsl, err := UnmarshalCleanCerts(bodyBytes, signer, current.URL)
+		tsl, err := UnmarshalCleanCerts(bodyBytes, current.URL)
 		if err == nil {
-			fmt.Println("Here should be verification:%v", tsl)
+			fmt.Printf("Here should be verification")
 			//if verification is successful then break
-			break
+			//here should be break
 		}
 
-		//if verification failed but we have tsl, we add children to continue with the loop
-		// here should list the pointers in the tsl
-		links := []string{"https://trustedlist.pts.se/SE-TL.xml", "https://trustedlist.pts.se/NL-TL.xml"}
+		links, err := FetchPontersToOtherListTSL(tsl)
+		if err != nil {
+			panic(err)
+		}
 
 		for _, link := range links {
-
 			child := Edge{URL: link, Depth: current.Depth + 1}
 			graph.AddEdge(current.URL, child)
 			if !visited[link] {
 				queue = append(queue, child)
 			}
-
 		}
 
 		if current.Depth == 0 {
@@ -96,6 +96,6 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte]) (*GraphUrls, err
 		}
 
 	}
-
+	fmt.Printf("%v", graph)
 	return graph, nil
 }

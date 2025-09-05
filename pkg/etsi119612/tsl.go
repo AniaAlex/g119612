@@ -53,17 +53,17 @@ func (tsl *TSL) cleanCerts() {
 	})
 }
 
-func FetchTSLBytes(url string) ([]byte, x509.Certificate, error) {
+func FetchTSLBytes(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, x509.Certificate{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, x509.Certificate{}, err
+		return nil, err
 	}
-	var signer = x509.Certificate{}
+
 	if bytes.Contains(bodyBytes, []byte("Signature>")) {
 
 		// lets try to validate a signature if we can
@@ -73,28 +73,40 @@ func FetchTSLBytes(url string) ([]byte, x509.Certificate, error) {
 			xml, err := validator.ValidateReferences()
 			if err == nil {
 				bodyBytes = []byte(xml[0])
-				signer = validator.SigningCert()
+				// do we really need to keep info about it?
+				_ = validator.SigningCert()
 			} else {
-				return nil, x509.Certificate{}, err
+				return nil, err
 			}
 		} else {
-			return nil, x509.Certificate{}, err
+			return nil, err
 		}
 	}
 
-	return bodyBytes, signer, err
+	return bodyBytes, err
 }
 
-func UnmarshalCleanCerts(bodyBytes []byte, signer x509.Certificate, url string) (*TSL, error) {
+func UnmarshalCleanCerts(bodyBytes []byte, url string) (*TSL, error) {
 	t := TSL{Source: url, StatusList: TrustStatusListType{}}
 	t.Signed = true
-	t.Signer = signer
 	err := xml.Unmarshal(bodyBytes, &t.StatusList)
 	if err != nil {
 		return nil, err
 	}
 	t.cleanCerts()
 	return &t, nil
+}
+
+func FetchPontersToOtherListTSL(tsl *TSL) ([]string, error) {
+	queue := []string{}
+	
+	TslPointersToOtherTSLList := tsl.StatusList.TslSchemeInformation.TslPointersToOtherTSL.TslOtherTSLPointer
+	fmt.Printf("%v", len(TslPointersToOtherTSLList))
+	for _, i := range TslPointersToOtherTSLList {
+		queue = append(queue, i.TSLLocation)
+	}
+	return queue, nil
+
 }
 
 // Create a TSL object from a URL. The URL is fetched with [net/http], parsed and unmarshalled
