@@ -6,6 +6,10 @@ import (
 
 	go_cache "github.com/eko/gocache/lib/v4/cache"
 )
+// todo: add validation 
+// todo: make a big test for the walker --- need a lotl signed mock that contains pointers to lets say existing se-tl 
+
+
 
 // pointer here insteda of value?
 type GraphUrls struct {
