@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <TrustServiceStatusList xmlns="http://uri.etsi.org/02231/v2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="TSL">
     <SchemeInformation>
-        <TSLType>http://uri.etsi.org/TrstSvc/TrustedList/TSLType/TSL</TSLType>
+        <TSLType>http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUgeneric</TSLType>
         <SchemeOperatorName>
             <Name xml:lang="en">Mock Italy TSL</Name>
         </SchemeOperatorName>
@@ -12,27 +12,27 @@
         <DistributionPoints>
             <URI>https://eidas.agid.gov.it/TL/TSL-IT.xml</URI>
         </DistributionPoints>
+        <PointersToOtherTSL>
+            <OtherTSLPointer>
+                <ServiceDigitalIdentities>
+                    <ServiceDigitalIdentity>
+                        <DigitalId>
+                            <X509Certificate>MIIEbjCCAtagAwIBAgIUDyYK0ZgcnRBXhc2I+6rNPxS9QHcwDQYJKoZIhvcNAQELBQAwPzELMAkGA1UEBhMCRVUxFTATBgNVBAoMDEV4YW1wbGUgTE9UTDEZMBcGA1UEAwwQTE9UTCBNb2NrIFNpZ25lcjAgFw0yNTA5MDgxMTQ0NTVaGA8yMTI1MDgxNTExNDQ1NVowPzELMAkGA1UEBhMCRVUxFTATBgNVBAoMDEV4YW1wbGUgTE9UTDEZMBcGA1UEAwwQTE9UTCBNb2NrIFNpZ25lcjCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAJQEY6fMnZL0ovwB+H0AzwIsBiqlUwn8pqPm5f1C5AxMI5K9QAXSj4XSHCGvYTCVQQ0MtRW3sTAsx1aBPmShKj84mrKYmYxKtaoXUe+S9fhnHTBJrrg3rrfWejra0rTQII6FtHaYhKh0HGNvW2J3qliyatMBxXKRup4ExYzB4yQ0w4X4SimBSX0JDW0wh7ueaZzdaetgYLcos3V56Dc5yB6YzDbRJ+Lr+70s91MFPQPzdNnc1Ph8RXjz7CaaI2+8ftFhfd4Mk4N/elC+gtdJnWewk6GfgpU25sFxmoxa8AhpFWewTZQoCt9KNU8IhG5O49s5daQdyv5U6InroFDPayzk723K4NjJdBhTeh/Cag+sq2bHZUBBQ9R+qb2M3GN5VOKCcZUyIzzfkc5G2/tK6BnMNIhu8i/bikEMAkzxePqhfG8W4tF98gSkm8xdoZmDAioodOu+qmDs6n4CCydm0lSm92wh2DkXSG2bQ/XO2u6RYGIpwnvVxMm2/z3pQPe/VwIDAQABo2AwXjAdBgNVHQ4EFgQUpqttGdYtuRzcYBnLVhDjRMAp8oswHwYDVR0jBBgwFoAUpqttGdYtuRzcYBnLVhDjRMAp8oswDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwDQYJKoZIhvcNAQELBQADggGBACGAJNl5572Di6109P6UMKrlBQivNkX3bkfASSdv5GEM7EoskpbYbgGQsnr38GsPlPYh77rT7UypGfGMXKeRheWdZsPt7Rx1j3zCgLI15pEY2PPKXP4B39mrtdaUC+ihuZDNiwwg8I2ZKXKdyR4G4+sAgkNZYxQAFOv4M3UsNhR41khYMHisR/AWzMZGLY/hvqyb9qzW97YiRU5eIN4iV4OhivqzyrlorTydCgcOfvnlSsQkJxRu5Ii5a3QTetkyulp78GfnPNUaH7nInysZDR89O8o7KeWTbx9krP/yFcURTnvs1BP271jS5dKHiFg8j5RGyRcxAasUp1iv4fhsEiMXtUMrDrIFox4AiS06JvWEekOLecJ0l/lYFMiGWs8SuNTbUoDYQa/+V3IG4USH+LQAp8eSrK/iALDtSiOC4aUgwoitL/UiIXw9acWZ+fXs1VA8ig+IVB08d5NqtNEh3pMjU/d4Royy0rb0ztQm7oMVFRvJw8dU0tJBaw58iPsrOg==</X509Certificate>
+                        </DigitalId>
+                    </ServiceDigitalIdentity>
+                </ServiceDigitalIdentities>
+                <TSLLocation>https://ec.europa.eu/tools/lotl/eu-lotl.xml</TSLLocation>
+                <AdditionalInformation>
+                    <OtherInformation>
+                        <TSLType>http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUlistofthelists</TSLType>
+                    </OtherInformation>
+                    <OtherInformation>
+                        <SchemeTerritory>EU</SchemeTerritory>
+                    </OtherInformation>
+                </AdditionalInformation>
+            </OtherTSLPointer>
+        </PointersToOtherTSL>
     </SchemeInformation>
-    <PointersToOtherTSL>
-        <OtherTSLPointer>
-            <ServiceDigitalIdentities>
-                <ServiceDigitalIdentity>
-                    <DigitalId>
-                        <X509Certificate>MIIEbjCCAtagAwIBAgIUDyYK0ZgcnRBXhc2I+6rNPxS9QHcwDQYJKoZIhvcNAQELBQAwPzELMAkGA1UEBhMCRVUxFTATBgNVBAoMDEV4YW1wbGUgTE9UTDEZMBcGA1UEAwwQTE9UTCBNb2NrIFNpZ25lcjAgFw0yNTA5MDgxMTQ0NTVaGA8yMTI1MDgxNTExNDQ1NVowPzELMAkGA1UEBhMCRVUxFTATBgNVBAoMDEV4YW1wbGUgTE9UTDEZMBcGA1UEAwwQTE9UTCBNb2NrIFNpZ25lcjCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAJQEY6fMnZL0ovwB+H0AzwIsBiqlUwn8pqPm5f1C5AxMI5K9QAXSj4XSHCGvYTCVQQ0MtRW3sTAsx1aBPmShKj84mrKYmYxKtaoXUe+S9fhnHTBJrrg3rrfWejra0rTQII6FtHaYhKh0HGNvW2J3qliyatMBxXKRup4ExYzB4yQ0w4X4SimBSX0JDW0wh7ueaZzdaetgYLcos3V56Dc5yB6YzDbRJ+Lr+70s91MFPQPzdNnc1Ph8RXjz7CaaI2+8ftFhfd4Mk4N/elC+gtdJnWewk6GfgpU25sFxmoxa8AhpFWewTZQoCt9KNU8IhG5O49s5daQdyv5U6InroFDPayzk723K4NjJdBhTeh/Cag+sq2bHZUBBQ9R+qb2M3GN5VOKCcZUyIzzfkc5G2/tK6BnMNIhu8i/bikEMAkzxePqhfG8W4tF98gSkm8xdoZmDAioodOu+qmDs6n4CCydm0lSm92wh2DkXSG2bQ/XO2u6RYGIpwnvVxMm2/z3pQPe/VwIDAQABo2AwXjAdBgNVHQ4EFgQUpqttGdYtuRzcYBnLVhDjRMAp8oswHwYDVR0jBBgwFoAUpqttGdYtuRzcYBnLVhDjRMAp8oswDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwDQYJKoZIhvcNAQELBQADggGBACGAJNl5572Di6109P6UMKrlBQivNkX3bkfASSdv5GEM7EoskpbYbgGQsnr38GsPlPYh77rT7UypGfGMXKeRheWdZsPt7Rx1j3zCgLI15pEY2PPKXP4B39mrtdaUC+ihuZDNiwwg8I2ZKXKdyR4G4+sAgkNZYxQAFOv4M3UsNhR41khYMHisR/AWzMZGLY/hvqyb9qzW97YiRU5eIN4iV4OhivqzyrlorTydCgcOfvnlSsQkJxRu5Ii5a3QTetkyulp78GfnPNUaH7nInysZDR89O8o7KeWTbx9krP/yFcURTnvs1BP271jS5dKHiFg8j5RGyRcxAasUp1iv4fhsEiMXtUMrDrIFox4AiS06JvWEekOLecJ0l/lYFMiGWs8SuNTbUoDYQa/+V3IG4USH+LQAp8eSrK/iALDtSiOC4aUgwoitL/UiIXw9acWZ+fXs1VA8ig+IVB08d5NqtNEh3pMjU/d4Royy0rb0ztQm7oMVFRvJw8dU0tJBaw58iPsrOg==</X509Certificate>
-                    </DigitalId>
-                </ServiceDigitalIdentity>
-            </ServiceDigitalIdentities>
-            <TSLLocation>https://ec.europa.eu/tools/lotl/eu-lotl.xml</TSLLocation>
-            <AdditionalInformation>
-                <OtherInformation>
-                    <TSLType>http://uri.etsi.org/TrstSvc/TrustedList/TSLType/LOTL</TSLType>
-                </OtherInformation>
-                <OtherInformation>
-                    <SchemeTerritory>EU</SchemeTerritory>
-                </OtherInformation>
-            </AdditionalInformation>
-        </OtherTSLPointer>
-    </PointersToOtherTSL>
     <TrustServiceProviderList>
         <TrustServiceProvider>
             <TSPInformation>
@@ -62,7 +62,7 @@
             </TSPServices>
         </TrustServiceProvider>
     </TrustServiceProviderList>
-    <ds:Signature><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#TSL"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>lvWOXv6khDUNIqZzM+MhROvorLaq7L81IwuCdZRbUlg=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>a13ZBxWazS61JzMfTw4xtOHaVWVavR+qN6a7H72KJDhTv9eCqHTrmYa9mAJzEPfzRahRQIG1qdybHtO9gd9yG+lBdFzw+ZiMIvLTdGXbJlMEIZa8RYO3th47wsXpGqO8S4erXuNUD+4z2M4LSkncwF3J4ml0qUhUVC+1SMcBJEcnSvPoGeIrFdEFSj4V7cuz0OavJmWWEfEVb5dIU4i5jPGbA0XVvCRaDz3pROzhWWpTVlh/BMfnNYD+rnnjcKqgwq21CE8N9anZEeJ1oLyJ2m+gAL+onmJRpPsuUA4+7H9d2mmQAstCjirEF3oWuvMXNhdLaqPeYV+gtNKiiurAZ2nhmGxkeKwFFYpO7wS1KSmX3I7m5LbZ5gSBbzkBbU6DSbe9lVYNuJwdV2b3seiYNU8Ne6nL6hTrEDfTfqLf3QoX3yB8FvGI0tyI+cAjkwbqTpAthljdiOuIoyhFVxSzoicZ+ImJpKUy4lYgsTyHnqWRI5SEs+45ODiimQN4WNTM</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEfDCCAuSgAwIBAgIUFP2HaK+mXHbZf3fvn8aZ5DGeyC0wDQYJKoZIhvcNAQEL
+<ds:Signature><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><ds:Reference URI="#TSL"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><ds:DigestValue>rlur613doCcVEVrSHxOy1mbzQ1BWGpOdXHbpYhQw6DE=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>YvMGktVeP2Y3StSuy6ylxKJCCj0c5GeV+TU/KbIbl9VP5378JWOA606vn9ZLEqcvZ10oWP7WVXp9/h2PEyLcOu31ANTk3lXZEtsFn4EWT5E0tQ1cSUEsiit9Qh4BzwbimQbfa6NIPvvwoqldNTXLkW2p8SsFsoZYHAJxLMAoZFkQGkj/aJe0QKmW7g67WMu4IcT+f7p+GvEE1/BaH/NILhinYbq5TrHbzmwSnzEomZbpLo4OblJCbqUa+bgX5eY8OQ3eC0ejXXEvvKy1Z+LhgR3Fp/s+QaKbPyo5ErbCOT7oZguUKoC7zciT7jM5CkvXtzDnMHQF0ewAGRyo8+K/svU0gbiQD9xdjImXa4/8+NWbAMNZEi+yDYwcVepcEhjEOBi58QxSeX3tOSORcxFbS0ef3Lp2sq2zLQYgHv8kIEFmjVyygPLZGwzySyIpYMURZy2t6wpdCPD8jo83M5N83Ad3VZHurhaa2hSqh3ayg2tPmRREqJ/49MAL+/Vxf5Ka</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIEfDCCAuSgAwIBAgIUFP2HaK+mXHbZf3fvn8aZ5DGeyC0wDQYJKoZIhvcNAQEL
 BQAwRjELMAkGA1UEBhMCSVQxGzAZBgNVBAoMEkV4YW1wbGUgSXRhbHkgVExTTzEa
 MBgGA1UEAwwRSVQtVEwgTW9jayBTaWduZXIwIBcNMjUwOTA4MTE0NDU1WhgPMjEy
 NTA4MTUxMTQ0NTVaMEYxCzAJBgNVBAYTAklUMRswGQYDVQQKDBJFeGFtcGxlIEl0

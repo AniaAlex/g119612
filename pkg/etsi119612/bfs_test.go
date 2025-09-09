@@ -8,30 +8,22 @@ import (
 )
 
 func TestGraph(t *testing.T) {
+	gock.New("https://eidas.agid.gov.it").
+		Get("/TL/TSL-IT.xml").
+		Reply(200).
+		File("./testdata/testdata_walker/signed_it-tsl.xml")
 
 	defer gock.Off()
 	gock.New("https://trustedlist.pts.se").
 		Get("/SE-TL.xml").
 		Reply(200).
-		File("./testdata/SE-TL.xml")
+		File("./testdata/testdata_walker/signed_se-tl.xml")
 
 	defer gock.Off()
-	gock.New("https://trustedlist.pts.se").
-		Get("/SE-TL.xml").
+	gock.New("https://ec.europa.eu").
+		Get("/tools/lotl/eu-lotl.xml").
 		Reply(200).
-		File("./testdata/SE-TL.xml")
-
-	defer gock.Off()
-	gock.New("https://ec.europa.eu/tools/lotl").
-		Get("/eu-lotl.xml").
-		Reply(200).
-		File("./testdata/EWC-TL.xml")
-
-	defer gock.Off()
-	gock.New("https://ec.europa.eu/tools/lotl").
-		Get("/eu-lotl.xml").
-		Reply(200).
-		File("./testdata/EWC-TL.xml")
+		File("./testdata/testdata_walker/signed_lotl.xml")
 
 	cachesets := cache.CacheSettings{Backend: cache.BackendGoCache}
 	deps := cache.Dependencies{}
@@ -39,7 +31,7 @@ func TestGraph(t *testing.T) {
 	//probably mock here better
 	newCache := cache.NewCache[[]byte](cachesets, deps)
 
-	graph, error := GraphSearch("https://trustedlist.pts.se/SE-TL.xml", newCache)
+	graph, error := GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", newCache)
 
 	if error != nil {
 		t.Fatal(error)

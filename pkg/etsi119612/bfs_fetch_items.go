@@ -6,10 +6,9 @@ import (
 
 	go_cache "github.com/eko/gocache/lib/v4/cache"
 )
-// todo: add validation 
-// todo: make a big test for the walker --- need a lotl signed mock that contains pointers to lets say existing se-tl 
 
-
+// todo: add validation
+// todo: make a big test for the walker --- need a lotl signed mock that contains pointers to lets say existing se-tl
 
 // pointer here insteda of value?
 type GraphUrls struct {
@@ -37,8 +36,7 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte]) (*GraphUrls, err
 	queue := []Edge{{URL: rootURL, Depth: 0}}
 
 	//should be in loop
-	//to check the graph algorythm only, otherwise multiple middle steps
-
+	//to check the graph algorythm only, otherwise multiple middle step
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
@@ -63,40 +61,56 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte]) (*GraphUrls, err
 				}
 				tsl, err := UnmarshalCleanCerts(bodyBytes, current.URL)
 				_ = tsl
+				_ = err
+
 				if err == nil {
-					fmt.Printf("Here should be verification")
-					// here should be break
+					switch {
+					case tsl.IsLOTL():
+						fmt.Println("is lotl")
+						links, err := FetchPontersToOtherListTSL(tsl)
+						_ = links
+						if err != nil {
+							panic(err)
+						}
+						for _, link := range links {
+							child := Edge{URL: link, Depth: current.Depth + 1}
+							graph.AddEdge(current.URL, child)
+							if !visited[link] {
+								queue = append(queue, child)
+							}
+						}
+					case tsl.IsNationalTSL():
+						//here should be validation
+						break
+					}
 				}
 			}
-		}
-		//this function is not needed temp--will be from cache
-		bodyBytes, err = FetchTSLBytes(current.URL)
-		if err != nil {
-			panic(err)
-		}
-		// need to add signer somehow other way it later
-		tsl, err := UnmarshalCleanCerts(bodyBytes, current.URL)
-		if err == nil {
-			fmt.Printf("Here should be verification")
-			//if verification is successful then break
-			//here should be break
-		}
 
-		links, err := FetchPontersToOtherListTSL(tsl)
-		if err != nil {
-			panic(err)
-		}
+			// 	// need to add signer somehow other way it later
+			// 	tsl, err := UnmarshalCleanCerts(bodyBytes, current.URL)
+			// 	if err == nil {
+			// 		fmt.Printf("Here should be verification")
+			// 		//if verification is successful then break
+			// 		//here should be break
+			// 	}
 
-		for _, link := range links {
-			child := Edge{URL: link, Depth: current.Depth + 1}
-			graph.AddEdge(current.URL, child)
-			if !visited[link] {
-				queue = append(queue, child)
-			}
-		}
+			// 	links, err := FetchPontersToOtherListTSL(tsl)
+			// 	if err != nil {
+			// 		panic(err)
+			// 	}
 
-		if current.Depth == 0 {
-			graph.AddEdge("", Edge{URL: rootURL, Depth: 0})
+			// 	for _, link := range links {
+			// 		child := Edge{URL: link, Depth: current.Depth + 1}
+			// 		graph.AddEdge(current.URL, child)
+			// 		if !visited[link] {
+			// 			queue = append(queue, child)
+			// 		}
+			// 	}
+
+			// 	if current.Depth == 0 {
+			// 		graph.AddEdge("", Edge{URL: rootURL, Depth: 0})
+			// 	}
+
 		}
 
 	}

@@ -12,12 +12,18 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
-	"strings"
-
 	"github.com/moov-io/signedxml"
+)
+
+const (
+	TSLTypeLOTL          = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/LOTL"
+	TSLTypeEUListOfLists = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUlistofthelists"
+	TSLTypeTSL           = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/TSL"
+	TSLTypeEUGeneric     = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUgeneric"
 )
 
 // A representation of an ETSI 119 612 trust status list. The main struct type StatusList
@@ -53,6 +59,48 @@ func (tsl *TSL) cleanCerts() {
 	})
 }
 
+func (tsl *TSL) IsLOTL() bool {
+	return tsl != nil && tsl.StatusList.TslSchemeInformation != nil &&
+		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeLOTL || tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUListOfLists)
+}
+
+func (tsl *TSL) IsNationalTSL() bool {
+	return tsl != nil && tsl.StatusList.TslSchemeInformation != nil &&
+		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeTSL || tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUGeneric)
+}
+
+// func (tsl *TSL) cleanCerts() {
+// 	if tsl == nil {
+// 		return
+// 	}
+// 	tsl.withTrustServices(func(_ *TSPType, svc *TSPServiceType) {
+// 		if svc == nil || svc.TslServiceInformation == nil {
+// 			return
+// 		}
+// 		sdi := svc.TslServiceInformation.TslServiceDigitalIdentity
+// 		if sdi == nil || len(sdi.DigitalId) == 0 {
+// 			return
+// 		}
+
+// 		for _, di := range sdi.DigitalId {
+// 			if di == nil || di.X509Certificate == "" {
+// 				continue
+// 			}
+// 			di.X509Certificate = removeAllSpace(di.X509Certificate)
+// 		}
+// 	})
+// }
+
+// func removeAllSpace(s string) string {
+// 	out := make([]rune, 0, len(s))
+// 	for _, r := range s {
+// 		if !unicode.IsSpace(r) {
+// 			out = append(out, r)
+// 		}
+// 	}
+// 	return string(out)
+// }
+
 func FetchTSLBytes(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -63,7 +111,7 @@ func FetchTSLBytes(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println(url)
 	if bytes.Contains(bodyBytes, []byte("Signature>")) {
 
 		// lets try to validate a signature if we can
@@ -73,7 +121,6 @@ func FetchTSLBytes(url string) ([]byte, error) {
 			xml, err := validator.ValidateReferences()
 			if err == nil {
 				bodyBytes = []byte(xml[0])
-				// do we really need to keep info about it?
 				_ = validator.SigningCert()
 			} else {
 				return nil, err
@@ -82,6 +129,7 @@ func FetchTSLBytes(url string) ([]byte, error) {
 			return nil, err
 		}
 	}
+	fmt.Println(url)
 
 	return bodyBytes, err
 }
@@ -93,19 +141,21 @@ func UnmarshalCleanCerts(bodyBytes []byte, url string) (*TSL, error) {
 	if err != nil {
 		return nil, err
 	}
-	t.cleanCerts()
+	//mb do smth else with it later: does not work on lotl
+	//t.cleanCerts()
 	return &t, nil
 }
 
 func FetchPontersToOtherListTSL(tsl *TSL) ([]string, error) {
-	queue := []string{}
-	
+	queuePointers := []string{}
+
 	TslPointersToOtherTSLList := tsl.StatusList.TslSchemeInformation.TslPointersToOtherTSL.TslOtherTSLPointer
+
 	fmt.Printf("%v", len(TslPointersToOtherTSLList))
 	for _, i := range TslPointersToOtherTSLList {
-		queue = append(queue, i.TSLLocation)
+		queuePointers = append(queuePointers, i.TSLLocation)
 	}
-	return queue, nil
+	return queuePointers, nil
 
 }
 
