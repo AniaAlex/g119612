@@ -131,6 +131,7 @@ func FetchTSLBytes(url string) ([]byte, error) {
 	}
 	fmt.Println(url)
 
+	//TODO:allows the certificates without a signature -- fix 
 	return bodyBytes, err
 }
 
