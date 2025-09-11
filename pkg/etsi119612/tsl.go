@@ -20,9 +20,7 @@ import (
 )
 
 const (
-	TSLTypeLOTL          = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/LOTL"
 	TSLTypeEUListOfLists = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUlistofthelists"
-	TSLTypeTSL           = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/TSL"
 	TSLTypeEUGeneric     = "http://uri.etsi.org/TrstSvc/TrustedList/TSLType/EUgeneric"
 )
 
@@ -61,45 +59,13 @@ func (tsl *TSL) cleanCerts() {
 
 func (tsl *TSL) IsLOTL() bool {
 	return tsl != nil && tsl.StatusList.TslSchemeInformation != nil &&
-		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeLOTL || tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUListOfLists)
+		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUListOfLists)
 }
 
 func (tsl *TSL) IsNationalTSL() bool {
 	return tsl != nil && tsl.StatusList.TslSchemeInformation != nil &&
-		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeTSL || tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUGeneric)
+		(tsl.StatusList.TslSchemeInformation.TslTSLType == TSLTypeEUGeneric)
 }
-
-// func (tsl *TSL) cleanCerts() {
-// 	if tsl == nil {
-// 		return
-// 	}
-// 	tsl.withTrustServices(func(_ *TSPType, svc *TSPServiceType) {
-// 		if svc == nil || svc.TslServiceInformation == nil {
-// 			return
-// 		}
-// 		sdi := svc.TslServiceInformation.TslServiceDigitalIdentity
-// 		if sdi == nil || len(sdi.DigitalId) == 0 {
-// 			return
-// 		}
-
-// 		for _, di := range sdi.DigitalId {
-// 			if di == nil || di.X509Certificate == "" {
-// 				continue
-// 			}
-// 			di.X509Certificate = removeAllSpace(di.X509Certificate)
-// 		}
-// 	})
-// }
-
-// func removeAllSpace(s string) string {
-// 	out := make([]rune, 0, len(s))
-// 	for _, r := range s {
-// 		if !unicode.IsSpace(r) {
-// 			out = append(out, r)
-// 		}
-// 	}
-// 	return string(out)
-// }
 
 func FetchTSLBytes(url string) ([]byte, error) {
 	resp, err := http.Get(url)
@@ -131,7 +97,7 @@ func FetchTSLBytes(url string) ([]byte, error) {
 	}
 	fmt.Println(url)
 
-	//TODO:allows the certificates without a signature -- fix 
+	//TODO:allows the certificates without a signature -- fix
 	return bodyBytes, err
 }
 

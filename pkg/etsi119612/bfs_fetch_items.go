@@ -29,9 +29,7 @@ func (g *GraphUrls) AddEdge(parentURL string, edge Edge) {
 	g.adj[parentURL] = append(g.adj[parentURL], edge)
 }
 
-
-
-func fetchCacheorRemote(currentURL string, cache *go_cache.Cache[[]byte]) (*TSL, []byte, error) {
+func fetchCacheorRemote(currentURL string, cache go_cache.CacheInterface[[]byte]) (*TSL, []byte, error) {
 	var bodyBytes []byte
 	ctx := context.Background()
 	bodyBytes, err := cache.Get(ctx, currentURL)
@@ -41,8 +39,8 @@ func fetchCacheorRemote(currentURL string, cache *go_cache.Cache[[]byte]) (*TSL,
 		if fetchErr != nil {
 			return nil, nil, fmt.Errorf("fetch bytes error %s, %w", currentURL, fetchErr)
 		}
-		cacheErr := cache.Set(ctx, currentURL, bodyBytes)
-		if cacheErr != nil {
+		setErr := cache.Set(ctx, currentURL, bodyBytes)
+		if setErr != nil {
 			return nil, nil, fmt.Errorf("fetch bytes error %s, %w", currentURL, fetchErr)
 		}
 		if len(bodyBytes) == 0 {
@@ -64,7 +62,7 @@ func fetchCacheorRemote(currentURL string, cache *go_cache.Cache[[]byte]) (*TSL,
 }
 
 // better to have multiple options of cache
-func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte], leafCert *x509.Certificate) (*GraphUrls, error) {
+func GraphSearch(rootURL string, cache go_cache.CacheInterface[[]byte], leafCert *x509.Certificate, intermediatePool *x509.CertPool) (*GraphUrls, error) {
 	graph := NewGraph()
 	visited := map[string]bool{}
 
@@ -102,7 +100,7 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte], leafCert *x509.C
 			policy := *PolicyAll
 			pool := tsl.ToCertPool(&policy)
 			_, verifyErr := leafCert.Verify(x509.VerifyOptions{
-				Roots: pool})
+				Roots: pool, Intermediates: intermediatePool})
 			if verifyErr != nil {
 				links, err := FetchPontersToOtherListTSL(tsl)
 				if err != nil {
@@ -116,8 +114,6 @@ func GraphSearch(rootURL string, cache *go_cache.Cache[[]byte], leafCert *x509.C
 					}
 				}
 			} else {
-				fmt.Println("Chain verification succeeded")
-				fmt.Printf("%v", graph)
 				return graph, nil
 			}
 		default:
