@@ -32,6 +32,8 @@ type fetchFunctionType func(string) ([]byte, error)
 
 var FetchTSLSwapBytesFunction fetchFunctionType = FetchTSLBytes
 
+
+//TODO:redundant function
 func fetchCacheorRemote(currentURL string, cache go_cache.CacheInterface[[]byte]) (*TSL, []byte, error) {
 	var bodyBytes []byte
 	ctx := context.Background()
@@ -65,7 +67,7 @@ func fetchCacheorRemote(currentURL string, cache go_cache.CacheInterface[[]byte]
 }
 
 // better to have multiple options of cache
-func GraphSearch(rootURL string, cache go_cache.CacheInterface[[]byte], leafCert *x509.Certificate, intermediatePool *x509.CertPool) (*GraphUrls, error) {
+func GraphSearch(rootURL string, fetcher *CachedTSLFetcher, leafCert *x509.Certificate, intermediatePool *x509.CertPool) (*GraphUrls, error) {
 	graph := NewGraph()
 	visited := map[string]bool{}
 
@@ -79,11 +81,10 @@ func GraphSearch(rootURL string, cache go_cache.CacheInterface[[]byte], leafCert
 			continue
 		}
 		visited[current.URL] = true
-
-		tsl, bodyBytes, fetchErr := fetchCacheorRemote(current.URL, cache)
+		tsl, bodyBytes, fetchErr := fetcher.Fetcher(context.Background(), current.URL)
 		if fetchErr != nil {
 			// no error return
-			fmt.Errorf("error on cache fetch %w, %d", fetchErr, len(bodyBytes))
+			fmt.Errorf("error on fetch %w, %d", fetchErr, len(bodyBytes))
 			continue
 		}
 		switch {
