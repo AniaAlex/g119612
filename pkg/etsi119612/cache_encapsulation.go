@@ -64,7 +64,6 @@ type cachedTSLFetcher struct {
 }
 
 func (f *cachedTSLFetcher) Fetcher(ctx context.Context, url string, options ...Option) (*TSL, []byte, error) {
-
 	if cachedValue, err := f.cache.Get(ctx, url); err == nil && len(cachedValue) > 0 {
 		tsl, err := UnmarshalCleanCerts(cachedValue, url)
 		if err != nil {
@@ -81,7 +80,7 @@ func (f *cachedTSLFetcher) Fetcher(ctx context.Context, url string, options ...O
 		return nil, nil, nil
 	}
 
-	setErr := f.cache.Set(ctx, url, bodyBytes, WithExpiration(time.Hour*2))
+	setErr := f.cache.Set(ctx, url, bodyBytes, options...)
 	if setErr != nil {
 		return nil, nil, setErr
 	}
