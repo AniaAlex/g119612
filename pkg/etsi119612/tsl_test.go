@@ -1,7 +1,6 @@
 package etsi119612
 
 import (
-	"context"
 	"crypto/x509"
 	"net/http"
 	"slices"
@@ -796,74 +795,4 @@ func TestIsNationalTSL(t *testing.T) {
 	assert.False(t, tsl.IsLOTL())
 	assert.True(t, tsl.IsNationalTSL())
 
-}
-
-func TestFetchCacheOrRemoteFailedRequestjsonNoxml(t *testing.T) {
-	//set json instead of xml
-	defer gock.Off()
-	gock.New("https://trustedlist.pts.se/").
-		Get("/SE-TL").
-		Reply(200).
-		File("testdata/x5c_validation_test.go")
-	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
-	gocacheStore := gocstore.NewGoCache(gocacheClient)
-	newCache := go_cache.New[[]byte](gocacheStore)
-	_, _, err := fetchCacheorRemote("https://trustedlist.pts.se/SE-TL", newCache)
-	assert.Error(t, err)
-
-}
-
-// help function
-func FetchTSLReturnZeroBytes(url string) ([]byte, error) {
-	return []byte{}, nil
-}
-
-func TestFetchCacheOrRemoteZeroBytesFail(t *testing.T) {
-	defer gock.Off()
-	gock.New("https://trustedlist.pts.se/").
-		Get("/SE-TL").
-		Reply(200).
-		File("testdata/SE-TL.xml")
-	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
-	gocacheStore := gocstore.NewGoCache(gocacheClient)
-	newCache := go_cache.New[[]byte](gocacheStore)
-
-	FetchTSLSwapBytesFunction = FetchTSLReturnZeroBytes
-	_, _, err := fetchCacheorRemote("https://trustedlist.pts.se/SE-TL", newCache)
-	assert.EqualError(t, err, "empty body from https://trustedlist.pts.se/SE-TL")
-}
-
-func FetchTSLReturnStringNotBytes(url string) ([]byte, error) {
-	return []byte("here is text"), nil
-}
-func TestFetchCacheOrRemoteStringfromFetch(t *testing.T) {
-	defer gock.Off()
-	gock.New("https://trustedlist.pts.se/").
-		Get("/SE-TL").
-		Reply(200).
-		File("testdata/SE-TL.xml")
-	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
-	gocacheStore := gocstore.NewGoCache(gocacheClient)
-	newCache := go_cache.New[[]byte](gocacheStore)
-	FetchTSLSwapBytesFunction = FetchTSLReturnStringNotBytes
-	_, _, err := fetchCacheorRemote("https://trustedlist.pts.se/SE-TL", newCache)
-	// not clear why this gives value not found in store
-	assert.EqualError(t, err, "unmarshal input url=https://trustedlist.pts.se/SE-TL bytesLength=12, error=value not found in store")
-}
-
-func TestFetchCacheOrRemoteCacheContainsString(t *testing.T) {
-	defer gock.Off()
-	gock.New("https://trustedlist.pts.se/").
-		Get("/SE-TL").
-		Reply(200).
-		File("testdata/SE-TL.xml")
-	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
-	gocacheStore := gocstore.NewGoCache(gocacheClient)
-	newCache := go_cache.New[[]byte](gocacheStore)
-	ctx := context.Background()
-	bodyBytes := []byte("some meaningless text here")
-	err := newCache.Set(ctx, "https://trustedlist.pts.se/SE-TL", bodyBytes)
-	assert.NoError(t, err)
-	_, _, err = fetchCacheorRemote("https://trustedlist.pts.se/SE-TL", newCache)
-	assert.EqualError(t, err, "unmarshal bytes from cache input url=https://trustedlist.pts.se/SE-TL bytesLength=26, error=EOF")
 }

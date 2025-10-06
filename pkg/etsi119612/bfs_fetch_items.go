@@ -4,8 +4,6 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
-
-	go_cache "github.com/eko/gocache/lib/v4/cache"
 )
 
 // todo: add validation
@@ -33,41 +31,10 @@ type fetchFunctionType func(string) ([]byte, error)
 var FetchTSLSwapBytesFunction fetchFunctionType = FetchTSLBytes
 
 
-//TODO:redundant function
-func fetchCacheorRemote(currentURL string, cache go_cache.CacheInterface[[]byte]) (*TSL, []byte, error) {
-	var bodyBytes []byte
-	ctx := context.Background()
-	bodyBytes, err := cache.Get(ctx, currentURL)
-	fmt.Printf("cache.get %s -> err=%v len=%d\n", currentURL, err, len(bodyBytes))
-	if err != nil || len(bodyBytes) == 0 {
-		bodyBytes, fetchErr := FetchTSLSwapBytesFunction(currentURL)
-		if fetchErr != nil {
-			return nil, nil, fmt.Errorf("fetch bytes error %s, %w", currentURL, fetchErr)
-		}
-		setErr := cache.Set(ctx, currentURL, bodyBytes)
-		if setErr != nil {
-			return nil, nil, fmt.Errorf("set to cache bytes error %s, %w", currentURL, setErr)
-		}
-		if len(bodyBytes) == 0 {
-			return nil, nil, fmt.Errorf("empty body from %s", currentURL)
-		}
-		//probably fix later
-		tsl, unmarshError := UnmarshalCleanCerts(bodyBytes, currentURL)
-		if unmarshError != nil {
-			return nil, nil, fmt.Errorf("unmarshal input url=%s bytesLength=%v, error=%w", currentURL, len(bodyBytes), err)
-		}
-		return tsl, bodyBytes, nil
-	}
 
-	tsl, err := UnmarshalCleanCerts(bodyBytes, currentURL)
-	if err != nil {
-		return nil, nil, fmt.Errorf("unmarshal bytes from cache input url=%s bytesLength=%v, error=%v", currentURL, len(bodyBytes), err)
-	}
-	return tsl, bodyBytes, nil
-}
 
 // better to have multiple options of cache
-func GraphSearch(rootURL string, fetcher *CachedTSLFetcher, leafCert *x509.Certificate, intermediatePool *x509.CertPool) (*GraphUrls, error) {
+func GraphSearch(rootURL string, fetcher *cachedTSLFetcher, leafCert *x509.Certificate, intermediatePool *x509.CertPool) (*GraphUrls, error) {
 	graph := NewGraph()
 	visited := map[string]bool{}
 
