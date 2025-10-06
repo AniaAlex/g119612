@@ -51,7 +51,7 @@ func TestWalker(t *testing.T) {
 	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
 	gocacheStore := gocstore.NewGoCache(gocacheClient)
 	newCache := go_cache.New[[]byte](gocacheStore)
-	fetcher := NewCachedTSLFetcher(newCache)
+	fetcher := NewCachedTSLFetcherWithGoCache(newCache)
 	graph, error := GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", fetcher, leafCert, nil)
 
 	if error != nil {
@@ -100,7 +100,7 @@ func TestWalkerLOTLInCache(t *testing.T) {
 	ctx := context.Background()
 	err = newCache.Set(ctx, "https://ec.europa.eu/tools/lotl/eu-lotl.xml", bodyBytes)
 	assert.NoError(t, err)
-	fetcher := NewCachedTSLFetcher(newCache)
+	fetcher := NewCachedTSLFetcherWithGoCache(newCache)
 	graph, error := GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", fetcher, leafCert, nil)
 
 	if error != nil {
@@ -154,7 +154,7 @@ func TestWalkerSELOTLInCache(t *testing.T) {
 	assert.NoError(t, err)
 	err = newCache.Set(ctx, "https://trustedlist.pts.se/SE-TL.xml", slbodyBytes)
 	assert.NoError(t, err)
-	fetcher := NewCachedTSLFetcher(newCache)
+	fetcher := NewCachedTSLFetcherWithGoCache(newCache)
 	graph, error := GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", fetcher, leafCert, nil)
 
 	if error != nil {
@@ -205,7 +205,7 @@ func TestWalkerwithIntermediatesSuccess(t *testing.T) {
 	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
 	gocacheStore := gocstore.NewGoCache(gocacheClient)
 	newCache := go_cache.New[[]byte](gocacheStore)
-	fetcher := NewCachedTSLFetcher(newCache)
+	fetcher := NewCachedTSLFetcherWithGoCache(newCache)
 	_, err = GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", fetcher, leafCert, intermediatePool)
 	assert.NoError(t, err)
 
@@ -254,7 +254,7 @@ func TestWalkerwithIntermediatesError(t *testing.T) {
 	gocacheClient := goc.New(5*time.Minute, 10*time.Minute)
 	gocacheStore := gocstore.NewGoCache(gocacheClient)
 	newCache := go_cache.New[[]byte](gocacheStore)
-	fetcher := NewCachedTSLFetcher(newCache)
+	fetcher := NewCachedTSLFetcherWithGoCache(newCache)
 	_, err = GraphSearch("https://ec.europa.eu/tools/lotl/eu-lotl.xml", fetcher, leafCert, nil)
 	assert.Error(t, err)
 }
