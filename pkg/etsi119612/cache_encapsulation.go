@@ -2,19 +2,34 @@ package etsi119612
 
 import (
 	"context"
+	"time"
 
 	go_cache "github.com/eko/gocache/lib/v4/cache"
 )
 
 // we do not need code that we do not use
 // add here some other parts
-type ByteCache interface {
+type LocalCacheInterface[T any] interface {
 	Get(ctx context.Context, key string) ([]byte, error)
 	Set(ctx context.Context, key string, b []byte, opts ...Option) error
 	Delete(ctx context.Context, key string) error
 }
+type Option func(o *Options)
 
-type Option struct{}
+type Options struct {
+	Expiration time.Duration
+}
+
+func (o *Options) IsEmpty() bool {
+	return o.Expiration == 0
+
+}
+
+func WithExpiration(expiration time.Duration) Option {
+	return func(o *Options) {
+		o.Expiration = expiration
+	}
+}
 
 // reduce the number of functions for go cache using interface segregation principle
 type GoCacheAdapter struct {
@@ -35,7 +50,7 @@ func (g *GoCacheAdapter) Delete(ctx context.Context, key string) error {
 }
 
 // patrial encapsulation, more encapsulation is needed here
-func NewCachedTSLFetcher(cache ByteCache) *cachedTSLFetcher {
+func NewCachedTSLFetcher(cache LocalCacheInterface[[]byte]) *cachedTSLFetcher {
 	return &cachedTSLFetcher{cache: cache}
 }
 
@@ -45,10 +60,11 @@ func NewCachedTSLFetcherWithGoCache(cache go_cache.CacheInterface[[]byte]) *cach
 }
 
 type cachedTSLFetcher struct {
-	cache ByteCache
+	cache LocalCacheInterface[[]byte]
 }
 
-func (f *cachedTSLFetcher) Fetcher(ctx context.Context, url string) (*TSL, []byte, error) {
+func (f *cachedTSLFetcher) Fetcher(ctx context.Context, url string, options ...Option) (*TSL, []byte, error) {
+
 	if cachedValue, err := f.cache.Get(ctx, url); err == nil && len(cachedValue) > 0 {
 		tsl, err := UnmarshalCleanCerts(cachedValue, url)
 		if err != nil {
@@ -64,7 +80,8 @@ func (f *cachedTSLFetcher) Fetcher(ctx context.Context, url string) (*TSL, []byt
 	if len(bodyBytes) == 0 {
 		return nil, nil, nil
 	}
-	setErr := f.cache.Set(ctx, url, bodyBytes)
+
+	setErr := f.cache.Set(ctx, url, bodyBytes, WithExpiration(time.Hour*2))
 	if setErr != nil {
 		return nil, nil, setErr
 	}
